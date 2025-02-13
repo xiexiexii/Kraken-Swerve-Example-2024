@@ -11,11 +11,16 @@ import frc.robot.Constants.SwerveConstants;
 import java.io.File;
 import java.util.function.DoubleSupplier;
 
+import com.ctre.phoenix.music.Orchestra;
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.revrobotics.CANSparkMax;
+
 import edu.wpi.first.wpilibj.Filesystem;
 import swervelib.parser.SwerveParser;
 import swervelib.telemetry.SwerveDriveTelemetry;
 import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 import swervelib.SwerveDrive;
+import swervelib.SwerveModule;
 import swervelib.math.SwerveMath;
 import edu.wpi.first.math.geometry.Translation2d;
 
@@ -25,6 +30,9 @@ public class SwerveSubsystem extends SubsystemBase {
   // Imports stuff from the JSON Files
   File directory = new File(Filesystem.getDeployDirectory(),"swerve");
   SwerveDrive swerveDrive;
+
+  // Orchestra, to sing and be happy
+  Orchestra m_orchestra = new Orchestra();
 
   // Creates a New SwerveSubsystem
   public SwerveSubsystem() {
@@ -44,6 +52,14 @@ public class SwerveSubsystem extends SubsystemBase {
     
     // Cosine Compensator makes your robot slower on some wheels. Set it to false if it drives funky
     swerveDrive.setCosineCompensator(false);
+
+    // Add all module Krakens to the Orchestra
+    for(SwerveModule m : swerveDrive.getModules()) {
+      m_orchestra.addInstrument((com.ctre.phoenix.motorcontrol.can.TalonFX) m.getAngleMotor().getMotor()); 
+      m_orchestra.addInstrument((com.ctre.phoenix.motorcontrol.can.TalonFX) m.getDriveMotor().getMotor());
+    }
+
+    m_orchestra.loadMusic("");
   }
 
   // Command to drive the robot using translative values and heading as angular velocity.
